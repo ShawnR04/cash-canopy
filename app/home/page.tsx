@@ -1,9 +1,44 @@
-import HomeClient from "./HomeClient";
+'use client' 
+
+import { useState }from "react";
+import Sidebar from "@/components/app/Sidebar";
+import Dashboard from "../pages/dashboard/page";
+import Transactions from "../pages/transactions/page";
+import Budgets from "../pages/budgets/page";
+import Report from "../pages/report/page";
+import Goals from "../pages/goals/page";
+import Settings from "../pages/settings/page";
 
 export default function Home(){
+    const [activeTab,setActiveTab] = useState("dashboard");
+    const renderContent = () => {
+        switch(activeTab){
+            case "dashboard": return <Dashboard/>;
+            case "transactions": return <Transactions/>
+            case "budgets": return <Budgets/>;
+            case "report": return <Report/>;
+            case "goals": return <Goals/>;
+            case "settings": return <Settings/>;
+            default: return null;
+        }
+    }
+
+    const username = "User"
+    
     return(
         <>
-            <HomeClient/>
+            <div className="h-dvh">
+                <div className="overflow-hidden">
+                    <Sidebar
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        username={username}
+                    />
+                </div>
+                <div className="w-full h-full flex flex-col pt-15 md:pt-0 md:pl-60 transition-all duration-400 ease-in-out">
+                    {renderContent()}
+                </div>
+            </div>
         </>
     );
 }
