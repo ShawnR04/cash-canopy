@@ -54,14 +54,14 @@ export default function Sidebar({activeTab, setActiveTab, username}: NavMenuProp
             </div>
 
             {isOpen && (
-                <div className="fixed bg-card/50 inset-0 backdrop-blur-[2px] md:hidden transition-opacity"
+                <div className="fixed bg-card/50 inset-0 backdrop-blur-[2px] md:hidden transition-opacity z-1"
                     onClick={() => setIsOpen(false)}
                 />
             )}
 
             <aside 
                 className={`
-                    bg-card w-60 h-full p-4 fixed top-0 left-0 transform transition-all duration-400 ease-in-out
+                    bg-card w-60 h-full p-4 fixed top-0 left-0 transform transition-all duration-400 ease-in-out  z-1
                     ${isOpen ? "translate-x-0" : "-translate-x-full"}
                     md:translate-x-0 md:block
                 `}

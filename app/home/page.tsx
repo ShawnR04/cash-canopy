@@ -10,7 +10,7 @@ import Goals from "../pages/goals/page";
 import Settings from "../pages/settings/page";
 
 export default function Home(){
-    const [activeTab,setActiveTab] = useState("dashboard");
+    const [activeTab,setActiveTab] = useState("transactions");
     const renderContent = () => {
         switch(activeTab){
             case "dashboard": return <Dashboard/>;
