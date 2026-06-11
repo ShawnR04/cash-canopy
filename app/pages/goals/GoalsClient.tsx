@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { HiX } from "react-icons/hi";
+//
+import { toast } from "sonner";
+import { createGoal } from "@/app/actions/goals";
 
 export default function GoalsClient(){
     const [isOpen, setIsOpen] = useState(true);
@@ -30,6 +33,21 @@ export default function GoalsClient(){
       },
       { id: "target_date", text: "Target Date", type: "date", required: true },
     ];
+
+    const handleAction = async (formData: FormData) => {
+      const goalName = formData.get("name")?.toString() || "Goal";
+      //const targetAmount = formData.get("target_amount");
+      const toastId = toast.loading(`Adding ${goalName}...`);
+
+      const res = await createGoal(formData);
+
+      if (res?.success) {
+        setIsOpen(false);
+        toast.success(`${goalName} added successfully!`, { id: toastId });
+      } else {
+        toast.error(res?.error || `Failed to add ${goalName}.`, { id: toastId });
+      }
+    };
     return(
         <>
             <div className="h-full overflow-y-auto no-scrollbar">
@@ -51,7 +69,7 @@ export default function GoalsClient(){
                         className="w-full h-full absolute top-0 left-0 bg-card/50 backdrop-blur-[2px] flex items-center justify-center md:pl-60"
                     >
                         <form 
-                            action="" 
+                            action={handleAction}
                             className="bg-card w-90 md:w-110 p-3 gap-5 flex flex-col rounded-md"
                         >
                             <div className="h-10 flex items-center justify-between">

@@ -15,7 +15,7 @@ interface MainDashboardProps {
 }
 
 export default function HomeClient({ username , email}: MainDashboardProps){
-    const [activeTab,setActiveTab] = useState("transactions");
+    const [activeTab,setActiveTab] = useState("goals");
     const renderContent = () => {
         switch(activeTab){
             case "dashboard": return <Dashboard/>;
