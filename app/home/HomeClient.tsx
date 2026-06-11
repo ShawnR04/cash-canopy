@@ -2,28 +2,37 @@
 
 import { useState }from "react";
 import Sidebar from "@/components/app/Sidebar";
-import Dashboard from "../pages/dashboard/page";
-import Transactions from "../pages/transactions/page";
-import Budgets from "../pages/budgets/page";
-import Report from "../pages/report/page";
-import Goals from "../pages/goals/page";
-import Settings from "../pages/settings/page";
 
 interface MainDashboardProps {
-  username: string;
-  email: string | null;
+    username: string;
+    email: string | null;
+    dashboardTab: React.ReactNode;
+    transactionsTab: React.ReactNode;
+    budgetsTab: React.ReactNode;
+    reportTab: React.ReactNode;
+    goalsTab: React.ReactNode;
+    settingsTab: React.ReactNode;
 }
 
-export default function HomeClient({ username , email}: MainDashboardProps){
+export default function HomeClient({ 
+    username , 
+    email, 
+    dashboardTab, 
+    transactionsTab, 
+    budgetsTab, 
+    reportTab, 
+    goalsTab, 
+    settingsTab
+}: MainDashboardProps){
     const [activeTab,setActiveTab] = useState("goals");
     const renderContent = () => {
         switch(activeTab){
-            case "dashboard": return <Dashboard/>;
-            case "transactions": return <Transactions/>
-            case "budgets": return <Budgets/>;
-            case "report": return <Report/>;
-            case "goals": return <Goals/>;
-            case "settings": return <Settings/>;
+            case "dashboard": return dashboardTab;
+            case "transactions": return transactionsTab;
+            case "budgets": return budgetsTab;
+            case "report": return reportTab;
+            case "goals": return goalsTab;
+            case "settings": return settingsTab;
             default: return null;
         }
     }

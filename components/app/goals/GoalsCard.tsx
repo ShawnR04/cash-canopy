@@ -1,5 +1,5 @@
 
-export default function GoalScARD(){
+export default function GoalsCard(){
     return(
         <>
             <div className="">
