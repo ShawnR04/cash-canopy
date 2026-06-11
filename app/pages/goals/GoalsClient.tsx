@@ -2,10 +2,34 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { HiX } from "react-icons/hi";
 
 export default function GoalsClient(){
     const [isOpen, setIsOpen] = useState(true);
+
+    const INPUTBOXES = [
+      { 
+        id: "name", 
+        text: "Goal Name", 
+        type: "text", 
+        required: false
+      },
+      {
+        id: "target_amount",
+        text: "Target Amount ($)",
+        type: "number",
+        required: true,
+      },
+      {
+        id: "saved_amount",
+        text: "Amount Saved ($)",
+        type: "number",
+        required: true,
+      },
+      { id: "target_date", text: "Target Date", type: "date", required: true },
+    ];
     return(
         <>
             <div className="h-full overflow-y-auto no-scrollbar">
@@ -24,7 +48,6 @@ export default function GoalsClient(){
 
                 {!isOpen && (
                     <div 
-                        onClick={() => setIsOpen(!isOpen)}
                         className="w-full h-full absolute top-0 left-0 bg-card/50 backdrop-blur-[2px] flex items-center justify-center md:pl-60"
                     >
                         <form 
@@ -44,6 +67,20 @@ export default function GoalsClient(){
                                     <HiX className="w-6 h-6"/>
                                 </button>
                             </div>
+
+                            {INPUTBOXES.map((input) => (
+                                <div key={input.id} className="flex flex-col gap-2">
+                                    <Label className="text-muted-foreground text-lg">
+                                        {input.text}
+                                    </Label>
+                                    <Input
+                                        id={input.id}
+                                        type={input.type}
+                                        name={input.id}
+                                        className="h-10 transition-all duration-300"
+                                    />
+                                </div>
+                            ))}
 
                             <div className="flex justify-center items-center">
                                 <button 

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { HiX } from "react-icons/hi";
 
 export default function TransactionsClient(){
@@ -24,7 +26,6 @@ export default function TransactionsClient(){
 
                 {!isOpen && (
                     <div 
-                        onClick={() => setIsOpen(!isOpen)}
                         className="w-full h-full absolute top-0 left-0 bg-card/50 backdrop-blur-[2px] flex items-center justify-center md:pl-60"
                     >
                         <form 
@@ -43,6 +44,74 @@ export default function TransactionsClient(){
                                 >
                                     <HiX className="w-6 h-6"/>
                                 </button>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label className="text-muted-foreground text-lg">
+                                    Type
+                                </Label>
+                                <select 
+                                    name="type" 
+                                    id="type" 
+                                    title="type"
+                                    className="h-10 w-full min-w-0 rounded-lg border border-input bg-border/30 px-2.5 py-1 text-base text-muted-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                                >
+                                    {/* Explicitly style the options for light/dark themes */}
+                                    <option value="" className="bg-background text-muted-foreground">Select Type</option>
+                                    <option value="income" className="bg-background text-foreground">Income</option>
+                                    <option value="expense" className="bg-background text-foreground">Expense</option>
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label className="text-muted-foreground text-lg">
+                                    Amount ($)
+                                </Label>
+                                <Input
+                                    id="amount"
+                                    type="number"
+                                    name="amount"
+                                    className="h-10 transition-all duration-300"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label className="text-muted-foreground text-lg">
+                                    Description
+                                </Label>
+                                <Input
+                                    id="description"
+                                    type="text"
+                                    name="description"
+                                    className="h-10 transition-all duration-300"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label className="text-muted-foreground text-lg">
+                                    Category
+                                </Label>
+                                <select 
+                                    name="category" 
+                                    id="category" 
+                                    title="category"
+                                    className="h-10 w-full min-w-0 rounded-lg border border-input bg-border/30 px-2.5 py-1 text-base text-muted-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                                >
+                                    {/* Explicitly style the options for light/dark themes */}
+                                    <option value="" className="bg-background text-muted-foreground">Select Category</option>
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <Label className="text-muted-foreground text-lg">
+                                    Date
+                                </Label>
+                                <Input
+                                    id="date"
+                                    type="date"
+                                    name="date"
+                                    className="h-10 transition-all duration-300"
+                                />
                             </div>
 
                             <div className="flex justify-center items-center">
