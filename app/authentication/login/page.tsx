@@ -5,15 +5,47 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+//
+import { toast } from "sonner";
+import { loginUser } from "@/app/actions/login";
+import { useRouter } from "next/navigation";
 
 export default function Login(){
     const [showPassword, setShowPassword] = useState(false);
+
+    const router = useRouter();
+
+    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const formElement = e.currentTarget;
+      const formData = new FormData(formElement);
+
+      const toastId = toast.loading(`Logging in...`);
+
+      try {
+        const res = await loginUser(formData);
+
+        if (res?.success) {
+          toast.success(`Welcome ${formData.get("user")}`, { id: toastId });
+          formElement.reset();
+
+          setTimeout(() => {
+            router.push("/home");
+          }, 500);
+        } else {
+          toast.error(res?.error || `Failed to login`, { id: toastId });
+        }
+      } catch (error) {
+        toast.error("An unexpected error occured.", { id: toastId });
+      }
+    };
 
     return(
         <>
             <div className="h-dvh flex justify-center items-center">
                 <form 
-                    action="" 
+                    onSubmit={handleLogin}
                     className="bg-card w-90 md:w-110 p-3 gap-5 flex flex-col rounded-md"
                 >
                     <div className="flex flex-col items-center">
