@@ -14,7 +14,7 @@ interface UserSession {
 // This makes it easier to import multiple auth helpers from this file later if needed.
 export async function getUserProfile(): Promise<UserSession> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = cookieStore.get("session_token")?.value;
   const fallbackUser: UserSession = { username: "Guest", email: null };
 
   if (!token) return fallbackUser;

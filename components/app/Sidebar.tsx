@@ -78,7 +78,7 @@ export default function Sidebar({activeTab, setActiveTab, username}: NavMenuProp
                     </div>
                     <h1 className="font-bold text-xl flex flex-col items-center">
                         Welcome
-                        <span className="text-primary text-center">
+                        <span className="text-primary text-center capitalize">
                             {username}
                         </span>
                     </h1>

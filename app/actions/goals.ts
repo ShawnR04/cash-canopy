@@ -16,7 +16,7 @@ const encodedKey = new TextEncoder().encode(secretKey);
 export async function createGoal(formData: FormData) {
   // 1. Get user session token from cookies
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value; // Adjust "token" if your cookie name is different (e.g. "session")
+  const token = cookieStore.get("session_token")?.value; // Adjust "token" if your cookie name is different (e.g. "session")
 
   if (!token) {
     return { success: false, error: "Unauthorized: No session token found." };
