@@ -2,9 +2,30 @@
 
 import { useState } from "react";
 import { LogOut } from "lucide-react";
+import { logoutUser } from "@/app/actions/logout";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function LogoutButton(){
     const [isOpen, setIsOpen] = useState(false);
+
+    const router = useRouter();
+
+    const handleLogout = async () => {
+    setIsOpen(false); // Close the modal immediately when confirmed
+    const toastId = toast.loading("Logging out...");
+
+    const res = await logoutUser();
+
+    if (res.success) {
+      toast.success("Logged out successfully!", { id: toastId });
+      
+      router.push("/authentication/login");
+      router.refresh();
+    } else {
+      toast.error(res.error || "An error occurred during logout.", { id: toastId });
+    }
+  };
     return(
         <>
             <div 
@@ -33,7 +54,10 @@ export default function LogoutButton(){
                             >
                                 Cancel
                             </button>
-                            <button className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-md">
+                            <button 
+                                onClick={handleLogout}
+                                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-md"
+                            >
                                 Yes, Log out
                             </button>
                         </div>
