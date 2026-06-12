@@ -2,7 +2,7 @@
 export default function DashboardClient(){
     return(
         <>
-            <div className="">
+            <div className="p-4">
                 Dashboard Client
             </div>
         </>

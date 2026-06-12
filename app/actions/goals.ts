@@ -2,6 +2,7 @@
 
 import { db } from "@/db/index";
 import { goalsTable as goals } from "@/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
@@ -62,5 +63,41 @@ export async function createGoal(formData: FormData) {
   } catch (error) {
     console.error("Error creating goal:", error);
     return { success: false, error: "An unexpected error occurred." };
+  }
+}
+
+export async function updateGoals(id: number, add_amount: number, change_amount: number, name: string){
+    try{
+        await db
+        .update(goals)
+        .set({
+            saved_amount: sql`${goals.saved_amount} + ${add_amount}`,
+            target_amount:change_amount,
+            name:name
+        })
+        .where(eq(goals.id, id));
+
+    revalidatePath("/goals");
+    return { success: true };
+    }catch(error){
+        console.error("Error updating goal:", error);
+        return { success: false, error: "An unexpected error occurred." };
+    }
+}
+
+export async function deleteGoals(goalId: number) {
+  try {
+    // Perform the delete mutation in Turso
+    await db
+      .delete(goals)
+      .where(eq(goals.id, goalId));
+
+    // Purge the cache for the budgets page so the UI updates instantly
+    revalidatePath("/goals"); 
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete category from Turso:", error);
+    return { success: false, error: "Database operation failed" };
   }
 }

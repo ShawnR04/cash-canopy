@@ -2,7 +2,7 @@
 export default function ReportClient(){
     return(
         <>
-            <div className="">
+            <div className="p-4">
                 Report Client
             </div>
         </>

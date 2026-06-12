@@ -10,7 +10,7 @@ export default function TransactionsClient(){
     const [isOpen, setIsOpen] = useState(true);
     return(
         <>
-            <div className="h-full overflow-y-auto no-scrollbar">
+            <div className="h-full overflow-y-auto no-scrollbar p-4">
                 <div className="sticky top-0 flex h-15 w-full items-center justify-between p-2">
                     <h1 className="text-primary text-2xl font-bold md:text-3xl">
                         Transactions
