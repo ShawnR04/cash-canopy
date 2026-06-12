@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { HiX } from "react-icons/hi";
+//
+import { toast } from "sonner";
+import { createBudget } from "@/app/actions/budgets"
 
 export default function BudgetsClient(){
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     const INPUTBOXES = [
         {
@@ -23,6 +26,22 @@ export default function BudgetsClient(){
             required: true,
         }
     ];
+
+    const handleAction = async (formData: FormData) => {
+        const categoryName = formData.get('name') || "Category"
+
+        const toastId = toast.loading(`Adding ${categoryName}...`)
+
+        const res = await createBudget(formData);
+
+        if(res.success){
+            setIsOpen(false)
+            toast.success(`${categoryName} added successfully`,{ id: toastId });
+        }else{
+            toast.error(`Failed to add ${categoryName}.`, { id: toastId });
+        };
+
+    };
     return(
         <>
             <div className="h-full overflow-y-auto no-scrollbar p-4">
@@ -32,19 +51,19 @@ export default function BudgetsClient(){
                     </h1>
                     <Button
                         type="button"
-                        onClick={() => setIsOpen(!isOpen)}
+                        onClick={() => setIsOpen(true)}
                         className="flex h-10 items-center gap-2 font-semibold"
                     >
                         <span className="text-2xl font-bold">+</span> Add Budget
                     </Button>
                 </div>
 
-                {!isOpen && (
+                {isOpen && (
                     <div 
                         className="w-full h-full absolute top-0 left-0 bg-card/50 backdrop-blur-[2px] flex items-center justify-center md:pl-60"
                     >
                         <form 
-                            action="" 
+                            action={handleAction} 
                             className="bg-card w-90 md:w-110 p-3 gap-5 flex flex-col rounded-md"
                         >
                             <div className="h-10 flex items-center justify-between">
@@ -70,10 +89,32 @@ export default function BudgetsClient(){
                                         id={input.id}
                                         type={input.type}
                                         name={input.id}
+                                        required={input.required}
                                         className="h-10 transition-all duration-300"
                                     />
                                 </div>
                             ))}
+
+                            <div className="flex flex-col gap-2">
+                                <Label htmlFor="icon" className="text-muted-foreground text-base">
+                                  Icon
+                                </Label>
+                                <select name="icon" id="icon" title="icon"
+                                    defaultValue=""
+                                    required
+                                    className="h-10 w-full min-w-0 rounded-lg border border-input bg-border/30 px-2.5 py-1 text-base text-muted-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                                >
+                                    <option className="bg-background text-muted-foreground" value="" disabled>Select Category Icon</option>
+                                    <option className="bg-background text-foreground" value="Income">Income</option>
+                                    <option className="bg-background text-foreground" value="Savings">Savings</option>
+                                    <option className="bg-background text-foreground" value="Food">Food</option>
+                                    <option className="bg-background text-foreground" value="Shopping">Shopping</option>
+                                    <option className="bg-background text-foreground" value="Health">Health</option>
+                                    <option className="bg-background text-foreground" value="Entertainment">Entertainment</option>
+                                    <option className="bg-background text-foreground" value="Education">Education</option>
+                                    <option className="bg-background text-foreground" value="Other">Other</option>
+                                </select>
+                            </div>
 
                             <div className="flex justify-center items-center">
                                 <button 
