@@ -71,13 +71,26 @@ export async function getUserBudgets() {
  */
 export async function getUserGoals() {
   const userId = await getAuthUserId();
-  if (!userId) return [];
+  
+  // 🚩 DIAGNOSTIC LOG 1: Check if the user is authenticated
+  console.log("--- DEBUG GOALS FETCH ---");
+  console.log("Current Authenticated User ID:", userId);
+
+  if (!userId) {
+    console.log("❌ Fetch aborted: No authenticated user found in cookies.");
+    return [];
+  }
 
   try {
-    return await db
+    const results = await db
       .select()
       .from(goals)
       .where(eq(goals.userId, userId));
+      
+    // 🚩 DIAGNOSTIC LOG 2: Check what Turso returned for this specific ID
+    console.log(`Found ${results.length} goals in Turso for user:`, userId);
+    return results;
+
   } catch (error) {
     console.error("Error fetching goals:", error);
     return [];
