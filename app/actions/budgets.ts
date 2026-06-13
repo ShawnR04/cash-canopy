@@ -2,6 +2,7 @@
 
 import { db } from "@/db/index";
 import { categoriesTable as categories } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
@@ -54,5 +55,40 @@ export async function createBudget(formData: FormData) {
   } catch (error) {
     console.error("Error creating budget:", error);
     return { success: false, error: "An unexpected error occurred." };
+  }
+}
+
+export async function updateBudget(id: number, amount: number,name:string) {
+  try {
+    await db
+      .update(categories)
+      .set({ 
+        monthly_budget: amount
+        ,name:name
+       })
+      .where(eq(categories.id, id));
+
+    revalidatePath("/budgets"); 
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update category budget:", error);
+    return { success: false, error: "Failed to update budget" };
+  }
+}
+
+export async function deleteBudget(categoryId: number) {
+  try {
+    // Perform the delete mutation in Turso
+    await db
+      .delete(categories)
+      .where(eq(categories.id, categoryId));
+
+    // Purge the cache for the budgets page so the UI updates instantly
+    revalidatePath("/budgets"); 
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete category from Turso:", error);
+    return { success: false, error: "Database operation failed" };
   }
 }

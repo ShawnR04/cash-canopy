@@ -14,7 +14,7 @@ const secretKey = process.env.JWT_SECRET_KEY || process.env.JWT_SECRET || "my_sp
 const encodedKey = new TextEncoder().encode(secretKey);
 
 // Shared Private Helper to extract and verify the session user ID safely
-async function getAuthUserId() {
+export async function getAuthUserId() {
   const cookieStore = await cookies();
   const token = cookieStore.get("session_token")?.value;
 

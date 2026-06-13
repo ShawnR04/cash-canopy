@@ -8,8 +8,16 @@ import { HiX } from "react-icons/hi";
 //
 import { toast } from "sonner";
 import { createBudget } from "@/app/actions/budgets"
+import BudgetsCard from "@/components/app/budgets/BudgetsCard"
+//
+import type { SelectCategory } from "@/db/schema";
 
-export default function BudgetsClient(){
+
+interface BudgetClientProps{
+    budgets: SelectCategory[];
+}
+
+export default function BudgetsClient({budgets}:BudgetClientProps){
     const [isOpen, setIsOpen] = useState(false);
 
     const INPUTBOXES = [
@@ -56,6 +64,20 @@ export default function BudgetsClient(){
                     >
                         <span className="text-2xl font-bold">+</span> Add Budget
                     </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 flex-1 gap-4 overflow-y-auto no-scrollbar content-start">
+                    {budgets && budgets.length > 0 ? (
+                        budgets.map((budget) => (
+                            <BudgetsCard key={budget.id} category={budget} />
+                        ))
+                    ) : (
+                        <div className=" h-30 flex items-center justify-center col-span-3 text-center text-muted-foreground">
+                            <p className="bg-card h-2/3 w-1/2 flex items-center justify-center rounded-xl shadow-sm transition-all">
+                                No budgets found.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {isOpen && (

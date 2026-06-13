@@ -24,7 +24,7 @@ export default function HomeClient({
     goalsTab, 
     settingsTab
 }: MainDashboardProps){
-    const [activeTab,setActiveTab] = useState("budgets");
+    const [activeTab,setActiveTab] = useState("transactions");
     const renderContent = () => {
         switch(activeTab){
             case "dashboard": return dashboardTab;

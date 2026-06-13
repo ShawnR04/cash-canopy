@@ -192,7 +192,7 @@ export default function GoalsCard({goal}: {goal: SelectGoal}){
                                 Cancel
                             </Button>
                             <Button type="submit" className="flex-1 h-10 text-lg font-bold cursor-pointer hover:bg-primary/90 transition-all duration-300 bg-primary">
-                                Add Amount
+                                Change
                             </Button>
                         </div>
                     </form>
