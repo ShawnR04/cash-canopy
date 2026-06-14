@@ -34,3 +34,58 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+```bash
+npm i drizzle-orm
+npm i -D drizzle-kit
+npm i dotenv
+npm i @libsql/client
+```
+
+```bash
+npx drizzle-kit generate
+npx drizzle-kit migrate
+```
+
+Shadcn
+
+```bash
+npx shadcn@latest init
+npx shadcn@latest add button label pagination input popover sonner progress table dropdown-menu alert-dialog
+```
+
+React Icons
+
+Open [React Icons](https://react-icons.github.io/react-icons/icons/fa6/) for more icon choices
+
+```bash
+npm i react-icons
+```
+
+Recharts
+
+```bash
+npm install recharts
+```
+
+Themes
+
+```bash
+npm install next-themes
+```
+
+Email Sending
+```bash
+npm install resend
+```
+
+PDF Creation
+```bash
+npm i jspdf
+npm i jspdf-autotable
+```
+
+Bcrypt
+```bash
+npm install bcrypt-ts
+```
