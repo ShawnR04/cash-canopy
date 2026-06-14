@@ -9,12 +9,14 @@ import { HiX } from "react-icons/hi";
 import { toast } from "sonner";
 import { createTransaction } from "@/app/actions/transactions";
 import type { SelectCategory } from "@/db/schema";
+import TransactionsTable, { TransactionWithCategory } from "@/components/app/transactions/TransactionsTable";
 
 interface TransactionsClientProps {
     categories: SelectCategory[];
+    transactions: TransactionWithCategory[];
 }
 
-export default function TransactionsClient({ categories }: TransactionsClientProps){
+export default function TransactionsClient({ categories, transactions}: TransactionsClientProps){
     const [isOpen, setIsOpen] = useState(true);
 
     // Initialize with today's local date (avoiding UTC offset issues)
@@ -52,6 +54,14 @@ export default function TransactionsClient({ categories }: TransactionsClientPro
                     >
                         <span className="text-2xl font-bold">+</span> Add Transaction
                     </Button>
+                </div>
+
+                <div className="">
+                    <TransactionsTable 
+                        transactions={transactions}
+                        category={categories}
+                        itemsPerPage={10}
+                    />
                 </div>
 
                 {!isOpen && (

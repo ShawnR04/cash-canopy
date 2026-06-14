@@ -244,3 +244,54 @@ export async function createTransaction(
     };
   }
 }
+
+export async function updateTransaction(formData: FormData) {
+  try {
+    const id = Number(formData.get("id"));
+    const type = formData.get("type") as "income" | "expense";
+    const amount = Number(formData.get("amount"));
+    const description = formData.get("description") as string;
+    const categoryId = Number(formData.get("categoryId"));
+    const dateString = formData.get("date") as string;
+
+    if (!id || !type || !amount || !description || !categoryId || !dateString) {
+      return { success: false, error: "Missing required fields." };
+    }
+
+    const date = new Date(dateString);
+
+    await db
+      .update(transactionsTable)
+      .set({
+        type,
+        amount,
+        description,
+        categoryId,
+        date,
+      })
+      .where(eq(transactionsTable.id, id));
+
+    // Refresh the transactions page to reflect the updated data
+    revalidatePath("/transactions");
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating transaction:", error);
+    return { success: false, error: "Failed to update transaction." };
+  }
+}
+
+export async function deleteTransaction(id: number) {
+  try {
+    await db.delete(transactionsTable).where(eq(transactionsTable.id, id));
+    
+    revalidatePath("/transactions");
+    revalidatePath("/budgets"); // Revalidate budgets page to update the spent amount
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete transaction:", error);
+    return { success: false, error: "Failed to delete transaction" };
+  }
+}
+
