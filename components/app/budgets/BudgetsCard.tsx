@@ -10,7 +10,11 @@ import { toast } from "sonner";
 import type { SelectCategory } from "@/db/schema";
 import { updateBudget, deleteBudget} from "@/app/actions/budgets";
 
-export default function BudgetsCard({category}: {category: SelectCategory & {spentAmount?: number}}){
+type CategoryWithTransactions = SelectCategory & {
+    spentAmount: number;
+};
+
+export default function BudgetsCard({category}: {category: CategoryWithTransactions}){
     const Icon =
       categoryIconMap[category.icon as keyof typeof categoryIconMap] ??
       categoryIconMap.Other;
@@ -21,11 +25,11 @@ export default function BudgetsCard({category}: {category: SelectCategory & {spe
       categoryStyleMap2[category.icon as keyof typeof categoryStyleMap2] ||
       categoryStyleMap2.Other;
 
-    const spent = category.spentAmount || 0;
-    const budget = category.monthly_budget ?? 0;
-    const remaining = budget - spent;
+    const spent = category.spentAmount;
+    const available = category.monthly_budget ?? 0;
+    const remaining = available - spent;
 
-    const progress = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+    const progress = available > 0 ? Math.min((spent / available) * 100, 100) : 0;
 
     const [isUpdateOpen, setIsUpdateOpen] = useState(false);
 
@@ -81,7 +85,7 @@ export default function BudgetsCard({category}: {category: SelectCategory & {spe
                                 {category.name}
                             </h1>
                             <p className="text-[13px] text-muted-foreground">
-                                Budget: ${budget.toFixed(2)}
+                                Amount: ${available.toFixed(2)}
                             </p>
                         </div>
                     </div>
@@ -107,7 +111,7 @@ export default function BudgetsCard({category}: {category: SelectCategory & {spe
                 </div>
                 <div className="flex gap-2 justify-between">
                     <p className="text-[13px] text-muted-foreground">
-                      {progress.toFixed(0)}% of budget
+                      {progress.toFixed(0)}% spent
                     </p>
                     <p className="text-[13px] text-muted-foreground">
                       ${remaining.toFixed(2)} left

@@ -13,8 +13,12 @@ import BudgetsCard from "@/components/app/budgets/BudgetsCard"
 import type { SelectCategory } from "@/db/schema";
 
 
+type CategoryWithTransactions = SelectCategory & {
+    spentAmount: number;
+};
+
 interface BudgetClientProps{
-    budgets: SelectCategory[];
+    budgets: CategoryWithTransactions[];
 }
 
 export default function BudgetsClient({budgets}:BudgetClientProps){

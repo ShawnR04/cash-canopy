@@ -5,9 +5,39 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { HiX } from "react-icons/hi";
+//
+import { toast } from "sonner";
+import { createTransaction } from "@/app/actions/transactions";
+import type { SelectCategory } from "@/db/schema";
 
-export default function TransactionsClient(){
+interface TransactionsClientProps {
+    categories: SelectCategory[];
+}
+
+export default function TransactionsClient({ categories }: TransactionsClientProps){
     const [isOpen, setIsOpen] = useState(true);
+
+    // Initialize with today's local date (avoiding UTC offset issues)
+    const [transactionDate, setTransactionDate] = useState(() => {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    });
+
+    const handleAction = async (formData: FormData) => {
+      const result = await createTransaction(formData);
+
+      console.log(result);
+
+      if (result.success) {
+        toast.success("Transaction added successfully");
+        setIsOpen(true);
+      } else {
+        toast.error(result.details ? `${result.error} ${result.details}` : result.error);
+      }
+    };
     return(
         <>
             <div className="h-full overflow-y-auto no-scrollbar p-4">
@@ -29,7 +59,7 @@ export default function TransactionsClient(){
                         className="w-full h-full absolute top-0 left-0 bg-card/50 backdrop-blur-[2px] flex items-center justify-center md:pl-60"
                     >
                         <form 
-                            action="" 
+                            action={handleAction}
                             className="bg-card w-90 md:w-110 p-3 gap-5 flex flex-col rounded-md"
                         >
                             <div className="h-10 flex items-center justify-between">
@@ -54,6 +84,8 @@ export default function TransactionsClient(){
                                     name="type" 
                                     id="type" 
                                     title="type"
+                                    defaultValue=""
+                                    required
                                     className="h-10 w-full min-w-0 rounded-lg border border-input bg-border/30 px-2.5 py-1 text-base text-muted-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                                 >
                                     {/* Explicitly style the options for light/dark themes */}
@@ -71,6 +103,9 @@ export default function TransactionsClient(){
                                     id="amount"
                                     type="number"
                                     name="amount"
+                                    min="1"
+                                    step="1"
+                                    required
                                     className="h-10 transition-all duration-300"
                                 />
                             </div>
@@ -83,6 +118,7 @@ export default function TransactionsClient(){
                                     id="description"
                                     type="text"
                                     name="description"
+                                    required
                                     className="h-10 transition-all duration-300"
                                 />
                             </div>
@@ -92,13 +128,24 @@ export default function TransactionsClient(){
                                     Category
                                 </Label>
                                 <select 
-                                    name="category" 
-                                    id="category" 
+                                    name="categoryId"
+                                    id="categoryId"
                                     title="category"
+                                    defaultValue=""
+                                    required
                                     className="h-10 w-full min-w-0 rounded-lg border border-input bg-border/30 px-2.5 py-1 text-base text-muted-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                                 >
                                     {/* Explicitly style the options for light/dark themes */}
-                                    <option value="" className="bg-background text-muted-foreground">Select Category</option>
+                                    <option value="" disabled className="bg-background text-muted-foreground">Select Category</option>
+                                    {categories.map((category) => (
+                                        <option
+                                            key={category.id}
+                                            value={category.id}
+                                            className="bg-background text-foreground"
+                                        >
+                                            {category.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -111,6 +158,9 @@ export default function TransactionsClient(){
                                     type="date"
                                     name="date"
                                     className="h-10 transition-all duration-300"
+                                    value={transactionDate}
+                                    onChange={(e) => setTransactionDate(e.target.value)}
+                                    required
                                 />
                             </div>
 

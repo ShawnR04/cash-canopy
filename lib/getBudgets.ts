@@ -2,8 +2,6 @@
 import { db } from "@/db/index";
 import { categoriesTable as categories, transactionsTable as transactions } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
 import { getAuthUserId } from "./getUserData";
 
 
@@ -25,8 +23,7 @@ export async function getCategoriesWithSpending() {
         monthly_budget: categories.monthly_budget,
         icon: categories.icon,
         userId: categories.userId, // 🌟 FIXED: Added to resolve the CategoryWithSpent type mismatch
-        // Sums up transaction amounts for this specific category
-        totalSpent: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)`.mapWith(Number),
+        spentAmount: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)`.mapWith(Number),
       })
       .from(categories)
       .leftJoin(
