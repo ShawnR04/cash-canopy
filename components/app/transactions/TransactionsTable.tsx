@@ -255,11 +255,18 @@ export default function TransactionsTable({
                     </thead>
                     <tbody className="divide-y divide-border">
                         {currentData.length === 0 ? (
-                            <div className=" h-30 flex items-center justify-center col-span-3 text-center text-muted-foreground">
-                                <p className="bg-card h-2/3 w-1/2 flex items-center justify-center rounded-xl shadow-sm transition-all">
-                                    No Transactions found.
-                                </p>
-                            </div>
+                            <tr>
+                              <td
+                                colSpan={6}
+                                className="h-32 text-center text-muted-foreground"
+                              >
+                                <div className="h-30 flex items-center justify-center col-span-3 text-center text-muted-foreground">
+                                  <div className="bg-card h-2/3 w-1/2 flex items-center justify-center rounded-xl shadow-sm transition-all">
+                                    No transactions found.
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
                         ) : (
                             currentData.map((t) => {
                                 const Icon = t.categoryIcon

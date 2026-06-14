@@ -15,17 +15,19 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import LogoutButton from "./LogoutButton";
 import ExportData from "./ExportData";
+import AccountSwitcher from "./AccountSwitcher";
+import type { AccountSession } from "@/lib/auth/types";
 
 interface NavMenuProps{
     activeTab:string;
     setActiveTab: (id: string) => void;
     username: string;
+    accounts: AccountSession[];
 }
 
-export default function Sidebar({activeTab, setActiveTab, username}: NavMenuProps){
+export default function Sidebar({activeTab, setActiveTab, username, accounts}: NavMenuProps){
     const [isOpen, setIsOpen] = useState(false);
 
     const NAV_LINKS = [

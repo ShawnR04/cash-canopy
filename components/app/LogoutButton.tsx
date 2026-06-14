@@ -19,8 +19,9 @@ export default function LogoutButton(){
 
     if (res.success) {
       toast.success("Logged out successfully!", { id: toastId });
-      
-      router.push("/authentication/login");
+      if (!res.hasRemainingAccounts) {
+        router.push("/authentication/login");
+      }
       router.refresh();
     } else {
       toast.error(res.error || "An error occurred during logout.", { id: toastId });

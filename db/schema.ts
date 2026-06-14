@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 
 export const usersTable = sqliteTable("users", {
@@ -14,6 +14,25 @@ export const usersTable = sqliteTable("users", {
     .notNull()
     .$defaultFn(() => sql`CURRENT_TIMESTAMP`),
 });
+
+export const sessionsTable = sqliteTable(
+  "sessions",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+      .references(() => usersTable.id, { onDelete: "cascade" })
+      .notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+    expiresAt: integer("expiresAt", { mode: "timestamp" }).notNull(),
+    lastUsedAt: integer("lastUsedAt", { mode: "timestamp" }).notNull(),
+  },
+  (table) => [
+    index("sessions_userId_idx").on(table.userId),
+    index("sessions_expiresAt_idx").on(table.expiresAt),
+  ],
+);
 
 export const transactionsTable = sqliteTable("transactions", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -49,9 +68,17 @@ export const goalsTable = sqliteTable("goals", {
 });
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
+  sessions: many(sessionsTable),
   transactions: many(transactionsTable),
   categories: many(categoriesTable),
   goals: many(goalsTable),
+}));
+
+export const sessionsRelations = relations(sessionsTable, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [sessionsTable.userId],
+    references: [usersTable.id],
+  }),
 }));
 
 export const categoriesRelations = relations(
@@ -88,6 +115,9 @@ export const goalsRelations = relations(goalsTable, ({ one }) => ({
 
 export type InsertUser = typeof usersTable.$inferInsert;
 export type SelectUser = typeof usersTable.$inferSelect;
+
+export type InsertSession = typeof sessionsTable.$inferInsert;
+export type SelectSession = typeof sessionsTable.$inferSelect;
 
 export type InsertTransaction = typeof transactionsTable.$inferInsert;
 export type SelectTransaction = typeof transactionsTable.$inferSelect;

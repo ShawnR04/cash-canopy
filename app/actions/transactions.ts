@@ -4,20 +4,11 @@ import { db } from "@/db";
 import {
   categoriesTable,
   transactionsTable,
-  usersTable,
   type InsertTransaction,
 } from "@/db/schema";
+import { getCurrentSession } from "@/lib/auth/session";
 import { and, eq, sql } from "drizzle-orm";
-import { jwtVerify } from "jose";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
-
-const secretKey =
-  process.env.JWT_SECRET_KEY ||
-  process.env.JWT_SECRET ||
-  "my_special_secret_key";
-
-const encodedKey = new TextEncoder().encode(secretKey);
 
 type CreateTransactionResult =
   | { success: true }
@@ -72,37 +63,14 @@ function describeError(error: unknown) {
 export async function createTransaction(
   formData: FormData,
 ): Promise<CreateTransactionResult> {
-  const token = (await cookies()).get("session_token")?.value;
-
-  if (!token) {
+  const session = await getCurrentSession();
+  if (!session) {
     return {
       success: false,
-      error: "Unauthorized: No session token found.",
+      error: "Unauthorized: No active session.",
     };
   }
-
-  let userId: string;
-
-  try {
-    const { payload } = await jwtVerify(token, encodedKey, {
-      algorithms: ["HS256"],
-    });
-
-    if (typeof payload.userId !== "string" || !payload.userId.trim()) {
-      return {
-        success: false,
-        error: "Unauthorized: Session does not contain a valid user ID.",
-      };
-    }
-
-    userId = payload.userId;
-  } catch (error) {
-    console.error("Transaction authentication failed:", describeError(error));
-    return {
-      success: false,
-      error: "Unauthorized: Invalid or expired session.",
-    };
-  }
+  const userId = session.userId;
 
   const typeValue = getRequiredString(formData, "type");
   const amountValue = getRequiredString(formData, "amount");
@@ -147,19 +115,6 @@ export async function createTransaction(
   }
 
   try {
-    const [user] = await db
-      .select({ id: usersTable.id })
-      .from(usersTable)
-      .where(eq(usersTable.id, userId))
-      .limit(1);
-
-    if (!user) {
-      return {
-        success: false,
-        error: "Unauthorized: The session user no longer exists.",
-      };
-    }
-
     if (categoryId !== null) {
       const [category] = await db
         .select({ id: categoriesTable.id })
@@ -246,6 +201,9 @@ export async function createTransaction(
 }
 
 export async function updateTransaction(formData: FormData) {
+  const session = await getCurrentSession();
+  if (!session) return { success: false, error: "Unauthorized." };
+
   try {
     const id = Number(formData.get("id"));
     const type = formData.get("type") as "income" | "expense";
@@ -254,25 +212,93 @@ export async function updateTransaction(formData: FormData) {
     const categoryId = Number(formData.get("categoryId"));
     const dateString = formData.get("date") as string;
 
-    if (!id || !type || !amount || !description || !categoryId || !dateString) {
+    if (
+      !Number.isSafeInteger(id) ||
+      (type !== "income" && type !== "expense") ||
+      !Number.isSafeInteger(amount) ||
+      amount <= 0 ||
+      !description.trim() ||
+      !Number.isSafeInteger(categoryId) ||
+      categoryId <= 0 ||
+      !dateString
+    ) {
       return { success: false, error: "Missing required fields." };
     }
 
-    const date = new Date(dateString);
+    const date = parseDateInput(dateString);
+    if (!date) return { success: false, error: "Invalid date." };
 
-    await db
-      .update(transactionsTable)
-      .set({
-        type,
-        amount,
-        description,
-        categoryId,
-        date,
-      })
-      .where(eq(transactionsTable.id, id));
+    const [existingTransaction] = await db
+      .select()
+      .from(transactionsTable)
+      .where(
+        and(
+          eq(transactionsTable.id, id),
+          eq(transactionsTable.userId, session.userId),
+        ),
+      )
+      .limit(1);
 
-    // Refresh the transactions page to reflect the updated data
-    revalidatePath("/transactions");
+    if (!existingTransaction) {
+      return { success: false, error: "Transaction not found." };
+    }
+
+    const [category] = await db
+      .select({ id: categoriesTable.id })
+      .from(categoriesTable)
+      .where(
+        and(
+          eq(categoriesTable.id, categoryId),
+          eq(categoriesTable.userId, session.userId),
+        ),
+      )
+      .limit(1);
+
+    if (!category) return { success: false, error: "Category not found." };
+
+    await db.transaction(async (tx) => {
+      if (existingTransaction.type === "income" && existingTransaction.categoryId) {
+        await tx
+          .update(categoriesTable)
+          .set({
+            monthly_budget: sql`MAX(COALESCE(${categoriesTable.monthly_budget}, 0) - ${existingTransaction.amount}, 0)`,
+          })
+          .where(
+            and(
+              eq(categoriesTable.id, existingTransaction.categoryId),
+              eq(categoriesTable.userId, session.userId),
+            ),
+          );
+      }
+
+      if (type === "income") {
+        await tx
+          .update(categoriesTable)
+          .set({
+            monthly_budget: sql`COALESCE(${categoriesTable.monthly_budget}, 0) + ${amount}`,
+          })
+          .where(
+            and(
+              eq(categoriesTable.id, categoryId),
+              eq(categoriesTable.userId, session.userId),
+            ),
+          );
+      }
+
+      await tx
+        .update(transactionsTable)
+        .set({ type, amount, description: description.trim(), categoryId, date })
+        .where(
+          and(
+            eq(transactionsTable.id, id),
+            eq(transactionsTable.userId, session.userId),
+          ),
+        );
+    });
+
+    revalidatePath("/home");
+    revalidatePath("/pages/transactions");
+    revalidatePath("/pages/budgets");
     
     return { success: true };
   } catch (error) {
@@ -282,11 +308,51 @@ export async function updateTransaction(formData: FormData) {
 }
 
 export async function deleteTransaction(id: number) {
+  const session = await getCurrentSession();
+  if (!session) return { success: false, error: "Unauthorized." };
+
   try {
-    await db.delete(transactionsTable).where(eq(transactionsTable.id, id));
-    
-    revalidatePath("/transactions");
-    revalidatePath("/budgets"); // Revalidate budgets page to update the spent amount
+    const [transaction] = await db
+      .select()
+      .from(transactionsTable)
+      .where(
+        and(
+          eq(transactionsTable.id, id),
+          eq(transactionsTable.userId, session.userId),
+        ),
+      )
+      .limit(1);
+
+    if (!transaction) return { success: false, error: "Transaction not found." };
+
+    await db.transaction(async (tx) => {
+      if (transaction.type === "income" && transaction.categoryId) {
+        await tx
+          .update(categoriesTable)
+          .set({
+            monthly_budget: sql`MAX(COALESCE(${categoriesTable.monthly_budget}, 0) - ${transaction.amount}, 0)`,
+          })
+          .where(
+            and(
+              eq(categoriesTable.id, transaction.categoryId),
+              eq(categoriesTable.userId, session.userId),
+            ),
+          );
+      }
+
+      await tx
+        .delete(transactionsTable)
+        .where(
+          and(
+            eq(transactionsTable.id, id),
+            eq(transactionsTable.userId, session.userId),
+          ),
+        );
+    });
+
+    revalidatePath("/home");
+    revalidatePath("/pages/transactions");
+    revalidatePath("/pages/budgets");
     
     return { success: true };
   } catch (error) {
@@ -294,4 +360,3 @@ export async function deleteTransaction(id: number) {
     return { success: false, error: "Failed to delete transaction" };
   }
 }
-
