@@ -151,7 +151,7 @@ export default function TransactionsClient({ categories, transactions}: Transact
                                         <option
                                             key={category.id}
                                             value={category.id}
-                                            className="bg-background text-foreground"
+                                            className="bg-background text-foreground capitalize"
                                         >
                                             {category.name}
                                         </option>
