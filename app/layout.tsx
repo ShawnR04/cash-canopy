@@ -4,6 +4,8 @@ import "./globals.css";
 // UI Theme changer
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from 'sonner'
+import { Analytics } from "@vercel/analytics/next";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -61,6 +63,7 @@ export default function RootLayout({
         >
           {children}
           <Toaster richColors position="top-center" />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

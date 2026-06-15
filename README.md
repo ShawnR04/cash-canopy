@@ -97,3 +97,8 @@ npm install nuqs
 ```bash
 npm install @ducanh2912/next-pwa
 ```
+
+Vercel Web Analytics
+```bash
+npm i @vercel/analytics
+```
