@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import React, { useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "@/components/app/Sidebar";
 import type { AccountSession } from "@/lib/auth/types";
 import AccountSwitcher from "@/components/app/AccountSwitcher";
@@ -26,8 +27,24 @@ export default function HomeClient({
   goalsTab,
   settingsTab,
 }: MainDashboardProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
 
-  const [activeTab, setActiveTab] = useState("dashboard");
+  // 1. Read the tab from the URL search params (?tab=...)
+  // If no parameter exists, default seamlessly to "dashboard"
+  const activeTab = searchParams.get("tab") || "dashboard";
+
+  // 2. Custom state setter that updates the URL instead of local component state
+  const setActiveTab = (newTab: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", newTab);
+    
+    // Wrap in startTransition to keep the UI smooth during dynamic slot rendering swaps
+    startTransition(() => {
+      router.push(`?${params.toString()}`, { scroll: false });
+    });
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -44,7 +61,7 @@ export default function HomeClient({
       case "settings":
         return settingsTab;
       default:
-        return null;
+        return dashboardTab;
     }
   };
 
@@ -60,7 +77,7 @@ export default function HomeClient({
       </div>
 
       <div className="w-full h-full flex flex-col pt-15 md:pt-0 md:pl-60 transition-all duration-400 ease-in-out">
-        <div className="h-10 flex items-center justify-end mt-2">
+        <div className="h-10 flex items-center justify-end my-2">
           <div className="px-5">
             <AccountSwitcher
               accounts={accounts}
@@ -68,8 +85,9 @@ export default function HomeClient({
             />
           </div>
         </div>
-
-        {renderContent()}
+        <div className="flex-1 w-full overflow-hidden">
+          {renderContent()}
+        </div>
       </div>
     </div>
   );

@@ -89,3 +89,7 @@ Bcrypt
 ```bash
 npm install bcrypt-ts
 ```
+
+```bash
+npm install nuqs
+```

@@ -10,7 +10,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -22,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { HiDotsVertical, HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import { HiDotsVertical } from "react-icons/hi";
 import { categoryIconMap, categoryStyleMap } from "@/lib/categoryIcons";
 import { FaEllipsisH, FaTrash } from "react-icons/fa";
 import { FaFilePen } from "react-icons/fa6";
@@ -67,7 +66,7 @@ export default function TransactionsTable({
     const [currentPage, setCurrentPage] = useState(1);
 
     const sortedTransactions = [...(transactions || [])].sort((a, b) => {
-    const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
+      const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
       if (dateDiff !== 0) return dateDiff;
       return b.id - a.id;
     });
@@ -100,10 +99,9 @@ export default function TransactionsTable({
 
       formData.append("id", selectedTransaction.id.toString());
 
-      // Append noon time so timezone shifts don't push it to the previous day when saved
       const rawDate = formData.get("date") as string;
-      if (rawDate && !rawDate.includes("T")) {
-        formData.set("date", `${rawDate}T12:00:00`);
+      if (rawDate && rawDate.includes("T")) {
+        formData.set("date", rawDate.split("T")[0]);
       }
 
       const toastId = toast.loading("Updating transaction...");
@@ -113,36 +111,35 @@ export default function TransactionsTable({
           toast.success("Transaction updated!", { id: toastId });
           setIsOpen(false);
         } else {
-          toast.error("Failed to update transaction.", { id: toastId });
+          toast.error(res?.error || "Failed to update transaction.", { id: toastId });
         }
       } catch (e) {
         toast.error("An error occurred.", { id: toastId });
       }
     };
+
     return(
         <>
             {/* MOBILE TABLE VIEW */}
             <div className="md:hidden">
-                <table className="w-full table-fixed border-collapse text-sm md:hidden">
+                <table className="w-full table-fixed border-collapse text-sm">
                     <tbody className="divide-y divide-gray-100">
                         {currentData.length === 0 ? (
-                            <div className=" h-30 flex items-center justify-center col-span-3 text-center text-muted-foreground">
-                                <p className="bg-card h-2/3 w-1/2 flex items-center justify-center rounded-xl shadow-sm transition-all">
-                                    No Transactions found.
-                                </p>
-                            </div>
+                            <tr>
+                                <td className="h-30 flex items-center justify-center text-center text-muted-foreground">
+                                    <p className="bg-card h-2/3 w-1/2 flex items-center justify-center rounded-xl shadow-sm transition-all">
+                                        No Transactions found.
+                                    </p>
+                                </td>
+                            </tr>
                         ) : (
                             currentData.map((t) => {
                                 const Icon = t.categoryIcon
-                                  ? (categoryIconMap[
-                                      t.categoryIcon as keyof typeof categoryIconMap
-                                    ] ?? categoryIconMap.Other)
+                                  ? (categoryIconMap[t.categoryIcon as keyof typeof categoryIconMap] ?? categoryIconMap.Other)
                                   : FaEllipsisH;
                                 
                                 const specificStyle = t.categoryIcon
-                                  ? (categoryStyleMap[
-                                      t.categoryIcon as keyof typeof categoryStyleMap
-                                    ] ?? categoryStyleMap.Other)
+                                  ? (categoryStyleMap[t.categoryIcon as keyof typeof categoryStyleMap] ?? categoryStyleMap.Other)
                                   : categoryStyleMap.Other;
                                 
                                 const isIncome = t.type === "income";
@@ -152,8 +149,9 @@ export default function TransactionsTable({
                                         <td className="p-2">
                                             {t.description.length > 30 ? (
                                                 <Popover open={isHoveredM} onOpenChange={setIsHoveredM}>
-                                                    <PopoverTrigger className="">
-                                                        <p className=" capitalize font-semibold text-base cursor-pointer hover:text-primary transition-colors"
+                                                    <PopoverTrigger>
+                                                        <p 
+                                                            className="capitalize font-semibold text-base cursor-pointer hover:text-primary transition-colors"
                                                             onMouseEnter={() => setIsHoveredM(true)}
                                                             onMouseLeave={() => setIsHoveredM(false)}
                                                         >
@@ -162,7 +160,7 @@ export default function TransactionsTable({
                                                     </PopoverTrigger>
                                                     <PopoverContent
                                                         side="top"
-                                                        className="w-fit max-w-70 p-2 text-sm bg-card border border-border shadow-md rounded-md normal-case wrap-break-word"
+                                                        className="w-fit max-w-70 p-2 text-sm bg-card border border-border shadow-md rounded-md normal-case break-words"
                                                     >
                                                         {t.description}
                                                     </PopoverContent>
@@ -172,7 +170,7 @@ export default function TransactionsTable({
                                                     {t.description}
                                                 </p>
                                             )}
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 mt-1">
                                                 <span className="text-xs text-muted-foreground">
                                                     {new Date(t.date).toLocaleDateString("en-US", {
                                                       timeZone: "UTC",
@@ -181,21 +179,21 @@ export default function TransactionsTable({
                                                       year: "numeric",
                                                     })}
                                                 </span>
-                                                <div className="flex items-center text-xs text-muted-foreground gap-2">
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground text-sm shrink-0 ${specificStyle}`}>
+                                                <div className="flex items-center text-xs text-muted-foreground gap-1.5">
+                                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-primary-foreground text-[10px] shrink-0 ${specificStyle}`}>
                                                         <Icon/>
                                                     </div>
                                                     {t.categoryName || 'Uncategorized'}
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className=" w-1/3 p-2">
-                                            <div className="flex items-center justify-end gap-5">
-                                                <div className="flex flex-col items-center">
-                                                    <p className={`font-semibold text-base ${isIncome ? "text-emerald-600" : "text-destructive"}`}>
-                                                        {t.type.charAt(0).toUpperCase() + t.type.slice(1)}
+                                        <td className="w-1/3 p-2">
+                                            <div className="flex items-center justify-end gap-3">
+                                                <div className="flex flex-col items-end">
+                                                    <p className={`font-semibold text-xs capitalize ${isIncome ? "text-emerald-600" : "text-destructive"}`}>
+                                                        {t.type}
                                                     </p>
-                                                    <p className={`font-semibold ${isIncome ? "text-emerald-600" : "text-destructive"}`}>
+                                                    <p className={`font-bold text-sm ${isIncome ? "text-emerald-600" : "text-destructive"}`}>
                                                         {isIncome ? "+" : "-"}$
                                                         {Math.abs(t.amount).toLocaleString(undefined, {
                                                           minimumFractionDigits: 2,
@@ -204,10 +202,9 @@ export default function TransactionsTable({
                                                     </p>
                                                 </div>
                                                 <DropdownMenu>
-                                                    <DropdownMenuTrigger
-                                                      className="p-1 h-9 w-9 rounded-full active:bg-card hover:bg-background transition-colors flex items-center justify-center shrink-0"
-                                                    >
-                                                        <HiDotsVertical size={20}/>
+                                                    {/* FIXED: Removed internal raw button & asChild. DropdownMenuTrigger renders the single button layout cleanly */}
+                                                    <DropdownMenuTrigger className="p-1 h-8 w-8 rounded-full active:bg-card hover:bg-muted transition-colors flex items-center justify-center shrink-0 outline-none cursor-pointer">
+                                                        <HiDotsVertical size={16}/>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="w-32 bg-card border border-border rounded-lg shadow-md p-1">
                                                         <DropdownMenuItem 
@@ -241,51 +238,41 @@ export default function TransactionsTable({
                 </table>
             </div>
 
+            {/* DESKTOP TABLE VIEW */}
             <div className="hidden md:block w-full overflow-x-auto no-scrollbar">
                 <table className="w-full table-fixed border-collapse text-sm">
-                    <thead className="">
-                        <tr className="bg-card border-b text-primary font-bold">
-                            <th className="w-[25%] py-3 text-center rounded-l-xl">Date</th>
-                            <th className="w-[25%] py-3 text-center">Description</th>
-                            <th className="w-[25%] py-3 text-center">Category</th>
-                            <th className="w-[25%] py-3 text-center">Type</th>
-                            <th className="w-[25%] py-3 text-center">Amount</th>
-                            <th className="w-[25%] py-3 text-center">Actions</th>
+                    <thead>
+                        <tr className="bg-card border-b text-primary font-bold text-left">
+                            <th className="py-3 px-4 rounded-l-xl text-center">Date</th>
+                            <th className="py-3 px-4">Description</th>
+                            <th className="py-3 px-4">Category</th>
+                            <th className="py-3 px-4 text-center">Type</th>
+                            <th className="py-3 px-4 text-right">Amount</th>
+                            <th className="py-3 px-4 text-center rounded-r-xl">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                         {currentData.length === 0 ? (
                             <tr>
-                              <td
-                                colSpan={6}
-                                className="h-32 text-center text-muted-foreground"
-                              >
-                                <div className="h-30 flex items-center justify-center col-span-3 text-center text-muted-foreground">
-                                  <div className="bg-card h-2/3 w-1/2 flex items-center justify-center rounded-xl shadow-sm transition-all">
+                              <td colSpan={6} className="h-32 text-center text-muted-foreground py-8">
                                     No transactions found.
-                                  </div>
-                                </div>
                               </td>
                             </tr>
                         ) : (
                             currentData.map((t) => {
                                 const Icon = t.categoryIcon
-                                  ? (categoryIconMap[
-                                      t.categoryIcon as keyof typeof categoryIconMap
-                                    ] ?? categoryIconMap.Other)
+                                  ? (categoryIconMap[t.categoryIcon as keyof typeof categoryIconMap] ?? categoryIconMap.Other)
                                   : FaEllipsisH;
                                 
                                 const specificStyle = t.categoryIcon
-                                  ? (categoryStyleMap[
-                                      t.categoryIcon as keyof typeof categoryStyleMap
-                                    ] ?? categoryStyleMap.Other)
+                                  ? (categoryStyleMap[t.categoryIcon as keyof typeof categoryStyleMap] ?? categoryStyleMap.Other)
                                   : categoryStyleMap.Other;
                                 
                                 const isIncome = t.type === "income";
 
                                 return(
-                                    <tr key={t.id} className="hover:bg-card transition-colors">
-                                        <td className="text-center md:text-[14px] lg:text-[16px] py-2">
+                                    <tr key={t.id} className="hover:bg-card/50 transition-colors">
+                                        <td className="text-center py-3 px-4">
                                             {new Date(t.date).toLocaleDateString("en-US", {
                                               timeZone: "UTC",
                                               day: "2-digit",
@@ -293,11 +280,12 @@ export default function TransactionsTable({
                                               year: "numeric",
                                             })}
                                         </td>
-                                        <td className="text-center md:text-[14px] lg:text-[16px] font-medium italic capitalize max-w-45 lg:max-w-60">
+                                        <td className="py-3 px-4 font-medium max-w-[200px] truncate">
                                             {t.description.length > 20 ? (
                                                 <Popover open={isHovered} onOpenChange={setIsHovered}>
-                                                    <PopoverTrigger className="">
-                                                        <span className="w-full h-full min-h-10 flex items-center justify-center px-4 cursor-pointer hover:text-primary transition-colors"
+                                                    <PopoverTrigger>
+                                                        <span 
+                                                            className="cursor-pointer hover:text-primary transition-colors underline decoration-dotted"
                                                             onMouseEnter={() => setIsHovered(true)}
                                                             onMouseLeave={() => setIsHovered(false)}
                                                         >
@@ -306,57 +294,57 @@ export default function TransactionsTable({
                                                     </PopoverTrigger>
                                                     <PopoverContent
                                                         side="top"
-                                                        className="w-fit max-w-70 p-2 text-sm bg-card border border-border shadow-md rounded-md normal-case wrap-break-word"
+                                                        className="w-fit max-w-70 p-2 text-sm bg-card border border-border shadow-md rounded-md"
                                                     >
                                                         {t.description}
                                                     </PopoverContent>
                                                 </Popover>
                                             ) : (
-                                                <span className="">
-                                                    {t.description}
-                                                </span>
+                                                <span>{t.description}</span>
                                             )}
                                         </td>
-                                        <td className="">
-                                            <div className="flex items-center justify-start gap-2">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground text-sm shrink-0 ${specificStyle}`}>
-                                                    <Icon/>
+                                        <td className="py-3 px-4">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-primary-foreground text-xs shrink-0 ${specificStyle}`}>
+                                                    <Icon className="w-3 h-3" />
                                                 </div>
-                                                {t.categoryName || 'Uncategorized'}
+                                                <span className="truncate">{t.categoryName || 'Uncategorized'}</span>
                                             </div>
                                         </td>
-                                        <td className={`text-center md:text-[14px] lg:text-[16px] font-semibold ${isIncome ? "text-emerald-600" : "text-destructive"}`}>
-                                            {t.type.charAt(0).toUpperCase() + t.type.slice(1)}
+                                        <td className={`text-center py-3 px-4 font-semibold capitalize ${isIncome ? "text-emerald-600" : "text-destructive"}`}>
+                                            {t.type}
                                         </td>
-                                        <td className={`text-center md:text-[14px] lg:text-[16px] font-bold ${isIncome ? "text-emerald-600" : "text-destructive"}`}>
+                                        <td className={`text-right py-3 px-4 font-bold ${isIncome ? "text-emerald-600" : "text-destructive"}`}>
                                             {isIncome ? "+" : "-"}$
                                             {Math.abs(t.amount).toLocaleString(undefined, {
                                               minimumFractionDigits: 2,
                                               maximumFractionDigits: 2,
                                             })}
                                         </td>
-                                        <td className="flex items-center justify-center gap-1 py-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-primary hover:bg-primary/10"
-                                                onClick={() => {
-                                                  setSelectedTransaction(t);
-                                                  setTransactionDate(new Date(t.date).toISOString().split("T")[0]);
-                                                  setIsOpen(true);
-                                                }}
-                                            >
-                                                <FaFilePen/>
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-destructive hover:bg-destructive/10"
-                                                onClick={() => handleDelete(t.id)}
-                                                disabled={isDeleting === t.id}
-                                            >
-                                                <FaTrash size={16}/>
-                                            </Button>
+                                        <td className="py-3 px-4 text-center">
+                                            <div className="flex items-center justify-center gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-primary hover:bg-primary/10"
+                                                    onClick={() => {
+                                                      setSelectedTransaction(t);
+                                                      setTransactionDate(new Date(t.date).toISOString().split("T")[0]);
+                                                      setIsOpen(true);
+                                                    }}
+                                                >
+                                                    <FaFilePen className="h-4 w-4"/>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                                    onClick={() => handleDelete(t.id)}
+                                                    disabled={isDeleting === t.id}
+                                                >
+                                                    <FaTrash className="h-4 w-4"/>
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                 )
@@ -368,7 +356,7 @@ export default function TransactionsTable({
 
             {/* Pagination Controls */}
             {!disablePagination && totalPages > 1 && (
-              <Pagination>
+              <Pagination className="mt-4">
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
@@ -377,11 +365,7 @@ export default function TransactionsTable({
                         e.preventDefault();
                         if (currentPage > 1) setCurrentPage((p) => p - 1);
                       }}
-                      className={
-                        currentPage === 1
-                          ? "pointer-events-none opacity-50"
-                          : "cursor-pointer"
-                      }
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                   
@@ -407,63 +391,70 @@ export default function TransactionsTable({
                         e.preventDefault();
                         if (currentPage < totalPages) setCurrentPage((p) => p + 1);
                       }}
-                      className={
-                        currentPage === totalPages
-                          ? "pointer-events-none opacity-50"
-                          : "cursor-pointer"
-                      }
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
             )}
 
+            {/* MODAL DRAWER OVERLAY */}
             {isOpen && selectedTransaction && (
-            <div className="fixed top-0 left-0 z-50 h-full w-full flex items-center justify-center bg-black/60">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
               <form
                 action={handleUpdate}
-                className="w-120 flex flex-col bg-primary-foreground text-foreground rounded-xl px-5 py-5 gap-5"
+                className="w-full max-w-md flex flex-col bg-card border border-border shadow-2xl rounded-2xl p-6 gap-4"
               >
-                <div className="h-10 flex items-center justify-between">
-                  <h1 className="text-primary text-2xl font-bold">
+                <div className="flex items-center justify-between">
+                  <h1 className="text-foreground text-xl font-bold">
                     Update Transaction
                   </h1>
                   <Button
                     type="button"
-                    className="hover:text-destructive bg-transparent text-foreground"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full"
                     onClick={() => setIsOpen(false)}
                   >
-                    <RxCross2 />
+                    <RxCross2 className="h-4 w-4" />
                   </Button>
                 </div>
                 
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="type" className="text-muted-foreground text-[16px]">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="type" className="text-muted-foreground text-sm">
                     Type
                   </Label>
                   <select
                     name="type"
                     title="type"
                     id="type"
-                    className="h-10 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                    className="h-10 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     defaultValue={selectedTransaction.type}
                     required
                   >
-                    <option value="" disabled hidden>
-                      Select Type
-                    </option>
                     <option value="income">Income</option>
                     <option value="expense">Expense</option>
                   </select>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="amount" className="text-muted-foreground text-[16px]">
-                    Amount
+
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="amount" className="text-muted-foreground text-sm">
+                    Amount ($)
                   </Label>
-                  <Input type="number" id="amount" name="amount" defaultValue={selectedTransaction.amount} className="h-10" required />
+                  <Input 
+                    type="number" 
+                    id="amount" 
+                    name="amount" 
+                    step="0.01"
+                    min="0.01"
+                    defaultValue={Math.abs(selectedTransaction.amount)} 
+                    className="h-10" 
+                    required 
+                  />
                 </div>
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="description" className="text-muted-foreground text-[16px]">
+
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="description" className="text-muted-foreground text-sm">
                     Description
                   </Label>
                   <Input
@@ -475,21 +466,19 @@ export default function TransactionsTable({
                     required
                   />
                 </div>
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="categoryId" className="text-muted-foreground text-[16px]">
+
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="categoryId" className="text-muted-foreground text-sm">
                     Category
                   </Label>
                   <select
                     name="categoryId"
                     title="categoryId"
                     id="categoryId"
-                    className="h-10 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                    className="h-10 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     defaultValue={selectedTransaction.categoryId || ""}
-                    required
                   >
-                    <option value="" disabled hidden>
-                      Select Category
-                    </option>
+                    <option value="">Uncategorized</option>
                     {category?.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
@@ -497,32 +486,28 @@ export default function TransactionsTable({
                     ))}
                   </select>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <Label
-                    htmlFor="date"
-                    className="text-muted-foreground text-[16px]"
-                  >
+
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="date" className="text-muted-foreground text-sm">
                     Date
                   </Label>
                   <Input
                     id="date"
                     type="date"
                     name="date"
-                    className="h-10"
+                    className="h-10 bg-background"
                     value={transactionDate}
                     onChange={(e) => setTransactionDate(e.target.value)}
                     required
                   />
                 </div>
                   
-                <div className="flex align-center justify-center">
-                  <Button
+                <Button
                     type="submit"
-                    className="h-10 cursor-pointer hover:scale-105"
-                  >
+                    className="h-10 w-full mt-2 font-semibold shadow-sm"
+                >
                     Update Transaction
-                  </Button>
-                </div>
+                </Button>
               </form>
             </div>
         )}
