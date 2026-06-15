@@ -4,13 +4,38 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
+import { requestPasswordReset } from "@/app/actions/forgotPassword";
 
 export default function ForgotPassword(){
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const formElement = e.currentTarget;
+        const formData = new FormData(formElement);
+
+        const toastId = toast.loading(`Sending reset link...`);
+
+        try{
+            const res = await requestPasswordReset(formData);
+
+            if(res?.success){
+                toast.success(`Reset link sent successfully`, {id: toastId});
+                formElement.reset();
+            }else{
+                toast.error(res?.error || `Failed to send reset link`, {id: toastId});
+            }
+        }catch(error){
+            toast.error("121An unexpected error occured.", {id: toastId});
+        }
+
+    }
     return(
         <>
             <div className="h-dvh flex items-center justify-center">
                 <form 
-                    action="" 
+                    onSubmit={handleSubmit}
                     className="bg-card w-90 p-3 gap-3 flex flex-col rounded-md"
                 >
                     <div className="flex justify-center items-center">
