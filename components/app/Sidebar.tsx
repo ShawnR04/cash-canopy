@@ -25,9 +25,10 @@ interface NavMenuProps{
     setActiveTab: (id: string) => void;
     username: string;
     accounts: AccountSession[];
+    userId: string;
 }
 
-export default function Sidebar({activeTab, setActiveTab, username, accounts}: NavMenuProps){
+export default function Sidebar({activeTab, setActiveTab, username, accounts, userId}: NavMenuProps){
     const [isOpen, setIsOpen] = useState(false);
 
     const NAV_LINKS = [
@@ -113,7 +114,7 @@ export default function Sidebar({activeTab, setActiveTab, username, accounts}: N
                     ))}
 
                     <div className=" h-15 px-5 flex items-center justify-center">
-                        <ExportData/>
+                        <ExportData username={username} userId={userId} />
                     </div>
 
                     <div className=" h-10 px-5 flex items-center justify-between">
