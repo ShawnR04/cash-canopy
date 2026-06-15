@@ -114,7 +114,7 @@ export default function Sidebar({activeTab, setActiveTab, username, accounts, us
                     ))}
 
                     <div className=" h-15 px-5 flex items-center justify-center">
-                        <ExportData username={username} userId={userId} />
+                        <ExportData username={username} />
                     </div>
 
                     <div className=" h-10 px-5 flex items-center justify-between">

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 // UI Theme changer
@@ -17,7 +17,27 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CashCanopy",
-  description: "One stop for all you expense tracking needs.",
+  description: "One stop for all your expense tracking needs.",
+  // FIXED: Removed manual string reference since Next.js auto-detects app/manifest.ts
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "CashCanopy",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0085ff",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({

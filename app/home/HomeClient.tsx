@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "@/components/app/Sidebar";
 import type { AccountSession } from "@/lib/auth/types";
 import AccountSwitcher from "@/components/app/AccountSwitcher";
+import { getAuthUserId } from "@/lib/getUserData";
 
 interface MainDashboardProps {
   username: string;
@@ -15,6 +16,7 @@ interface MainDashboardProps {
   reportTab: React.ReactNode;
   goalsTab: React.ReactNode;
   settingsTab: React.ReactNode;
+  userId: string;
 }
 
 export default function HomeClient({
@@ -26,7 +28,10 @@ export default function HomeClient({
   reportTab,
   goalsTab,
   settingsTab,
+  userId,
 }: MainDashboardProps) {
+
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
@@ -73,6 +78,7 @@ export default function HomeClient({
           setActiveTab={setActiveTab}
           username={username}
           accounts={accounts}
+          userId={userId}
         />
       </div>
 

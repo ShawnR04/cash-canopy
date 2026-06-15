@@ -93,3 +93,7 @@ npm install bcrypt-ts
 ```bash
 npm install nuqs
 ```
+
+```bash
+npm install @ducanh2912/next-pwa
+```

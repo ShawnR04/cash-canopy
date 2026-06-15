@@ -1,5 +1,6 @@
 import HomeClient from "./HomeClient";
 import { getAccountSessions, getCurrentUser } from "@/lib/auth/session";
+import { getAuthUserId } from "@/lib/getUserData";
 import { redirect } from "next/navigation";
 import Dashboard from "../pages/dashboard/page";
 import Transactions from "../pages/transactions/page";
@@ -9,6 +10,7 @@ import Goals from "../pages/goals/page";
 import Settings from "../pages/settings/page";
 
 export default async function Home() {
+
   const [user, accounts] = await Promise.all([
     getCurrentUser(),
     getAccountSessions(),
@@ -26,6 +28,7 @@ export default async function Home() {
       reportTab={<Report />}
       goalsTab={<Goals />}
       settingsTab={<Settings />}
+      userId={(await getAuthUserId()) ?? ""}
     />
   );
 }
