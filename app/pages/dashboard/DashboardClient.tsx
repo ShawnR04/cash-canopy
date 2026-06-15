@@ -4,7 +4,7 @@ import DashboardPieChart from "@/components/app/dashboard/DashboardPieChart";
 //
 import{ getCategoriesWithSpending } from "@/lib/getBudgets";
 import type { SelectCategory } from "@/db/schema";
-import type { TransactionWithCategory } from "@/components/app/transactions/TransactionsTable";
+import TransactionsTable, { TransactionWithCategory } from "@/components/app/transactions/TransactionsTable";
 import { getDashboardStats } from "@/lib/getDashboardStats";
 
 
@@ -23,8 +23,15 @@ export default async function DashboardClient({categories,transactions}:Dashboar
                     <DashboardCards/>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    {/*<DashboardPieChart categories={Dashcategories} totalExpenses={monthlyExpenses}/>*/}
+                    <DashboardPieChart categories={Dashcategories} totalExpenses={monthlyExpenses}/>
                     <DashboardBarChart totalIncome={totalIncome} totalExpense={totalExpenses}/>
+                </div>
+                <div className="">
+                    <TransactionsTable 
+                        transactions={transactions}
+                        category={categories}
+                        itemsPerPage={10}
+                    />
                 </div>
             </div>
         </>
