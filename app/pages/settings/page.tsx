@@ -1,8 +1,9 @@
+import SettingsClient from "./SettingsClient";
 
 export default function Settings(){
     return(
         <>
-            <div className="">Settings</div>
+            <SettingsClient/>
         </>
     );
 }
