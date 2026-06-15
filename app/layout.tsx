@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from 'sonner'
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 
 const geistSans = Geist({
@@ -64,6 +65,7 @@ export default function RootLayout({
           {children}
           <Toaster richColors position="top-center" />
           <Analytics />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
