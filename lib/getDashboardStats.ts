@@ -1,7 +1,7 @@
 import { db } from "@/db/index";
 import { transactionsTable as transactions } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
-import { getAuthUserId } from "@/lib/getUserData";
+import { getAuthUserId, getUserBudgets } from "@/lib/getUserData";
 
 export async function getDashboardStats() {
   const userId = await getAuthUserId();
@@ -101,15 +101,20 @@ export async function getDashboardStats() {
       .from(transactions)
       .where(eq(transactions.userId, userId));
 
+    // Fetch the user's budgets to extract the manual Base Income
+    const budgets = await getUserBudgets();
+    const incomeCategory = budgets?.find((b) => b.name?.toLowerCase() === "income");
+    const baseIncome = Number(incomeCategory?.monthly_budget) || 0;
+
     // Fallback parser: Use parseFloat if drivers pass numeric aggregates back as a raw string wrapper
-    const monthlyIncome = parseFloat(String(result?.monthlyIncome ?? 0));
+    const monthlyIncome = parseFloat(String(result?.monthlyIncome ?? 0)) + baseIncome;
     const monthlyExpenses = parseFloat(String(result?.monthlyExpenses ?? 0));
-    const totalIncome = parseFloat(String(result?.totalIncome ?? 0));
+    const totalIncome = parseFloat(String(result?.totalIncome ?? 0)) + baseIncome;
     const totalExpenses = parseFloat(String(result?.totalExpenses ?? 0));
     
     const totalBalance = totalIncome - totalExpenses;
 
-    const lastMonthIncome = parseFloat(String(result?.lastMonthIncome ?? 0));
+    const lastMonthIncome = parseFloat(String(result?.lastMonthIncome ?? 0)) + baseIncome;
     const lastMonthExpenses = parseFloat(String(result?.lastMonthExpenses ?? 0));
     const lastMonthBalance = lastMonthIncome - lastMonthExpenses;
 

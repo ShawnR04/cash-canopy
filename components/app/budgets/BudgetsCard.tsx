@@ -67,6 +67,8 @@ export default function BudgetsCard({category}: {category: CategoryWithTransacti
           id: "amount",
           text: "Change Amount ($)",
           type: "number",
+          step: "0.01",
+          min: "0.01",
           placeholder:"",
           defaultValue: category.monthly_budget ?? "",
           required: false,
@@ -144,6 +146,8 @@ export default function BudgetsCard({category}: {category: CategoryWithTransacti
                               id={input.id}
                               type={input.type}
                               name={input.id}
+                              step={input.step}
+                              min={input.min}
                               className="h-10"
                               defaultValue={input.defaultValue}
                               placeholder={input.placeholder}

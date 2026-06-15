@@ -34,32 +34,33 @@ export const sessionsTable = sqliteTable(
   ],
 );
 
-export const transactionsTable = sqliteTable("transactions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: text("userId")
-    .references(() => usersTable.id)
-    .notNull(),
-  date: integer("date", { mode: "timestamp" }).notNull(),
-  description: text("description").notNull(),
-  categoryId: integer("categoryId").references(() => categoriesTable.id),
-  type: text("type").$type<"income" | "expense">().notNull(),
-  amount: integer("amount").notNull(),
-});
-
 export const categoriesTable = sqliteTable("categories", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: text("userId")
-    .references(() => usersTable.id)
+    .references(() => usersTable.id, { onDelete: "cascade" }) // Cascade if a user is deleted
     .notNull(),
   name: text("name").notNull(),
   monthly_budget: integer("monthly_budget").default(0),
   icon: text("icon").notNull(),
 });
 
+export const transactionsTable = sqliteTable("transactions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("userId")
+    .references(() => usersTable.id, { onDelete: "cascade" }) // Cascade if a user is deleted
+    .notNull(),
+  date: integer("date", { mode: "timestamp" }).notNull(),
+  description: text("description").notNull(),
+  // FIXED: Added cascade delete here. When a category is deleted, its transactions are deleted too.
+  categoryId: integer("categoryId").references(() => categoriesTable.id, { onDelete: "cascade" }),
+  type: text("type").$type<"income" | "expense">().notNull(),
+  amount: integer("amount").notNull(),
+});
+
 export const goalsTable = sqliteTable("goals", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: text("userId")
-    .references(() => usersTable.id)
+    .references(() => usersTable.id, { onDelete: "cascade" }) // Cascade if a user is deleted
     .notNull(),
   name: text("name").notNull(),
   target_amount: integer("target_amount").notNull(),
@@ -67,6 +68,7 @@ export const goalsTable = sqliteTable("goals", {
   target_date: integer("target_date", { mode: "timestamp" }),
 });
 
+/* Relations Blocks remain identical */
 export const usersRelations = relations(usersTable, ({ many }) => ({
   sessions: many(sessionsTable),
   transactions: many(transactionsTable),
@@ -113,17 +115,14 @@ export const goalsRelations = relations(goalsTable, ({ one }) => ({
   }),
 }));
 
+/* Type Exports remain identical */
 export type InsertUser = typeof usersTable.$inferInsert;
 export type SelectUser = typeof usersTable.$inferSelect;
-
 export type InsertSession = typeof sessionsTable.$inferInsert;
 export type SelectSession = typeof sessionsTable.$inferSelect;
-
 export type InsertTransaction = typeof transactionsTable.$inferInsert;
 export type SelectTransaction = typeof transactionsTable.$inferSelect;
-
 export type InsertCategory = typeof categoriesTable.$inferInsert;
 export type SelectCategory = typeof categoriesTable.$inferSelect;
-
 export type InsertGoal = typeof goalsTable.$inferInsert;
 export type SelectGoal = typeof goalsTable.$inferSelect;

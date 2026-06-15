@@ -113,8 +113,8 @@ export default function TransactionsClient({ categories, transactions}: Transact
                                     id="amount"
                                     type="number"
                                     name="amount"
-                                    min="1"
-                                    step="1"
+                                    min="0.01"
+                                    step="0.01"
                                     required
                                     className="h-10 transition-all duration-300"
                                 />
@@ -143,7 +143,7 @@ export default function TransactionsClient({ categories, transactions}: Transact
                                     title="category"
                                     defaultValue=""
                                     required
-                                    className="h-10 w-full min-w-0 rounded-lg border border-input bg-border/30 px-2.5 py-1 text-base text-muted-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                                    className="h-10 w-full min-w-0 rounded-lg border border-input bg-border/30 px-2.5 py-1 text-base text-muted-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 capiatlize"
                                 >
                                     {/* Explicitly style the options for light/dark themes */}
                                     <option value="" disabled className="bg-background text-muted-foreground">Select Category</option>

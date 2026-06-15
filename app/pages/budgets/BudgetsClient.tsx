@@ -9,6 +9,7 @@ import { HiX } from "react-icons/hi";
 import { toast } from "sonner";
 import { createBudget } from "@/app/actions/budgets"
 import BudgetsCard from "@/components/app/budgets/BudgetsCard"
+import TotalBudget from "@/components/app/budgets/TotalBudget"
 //
 import type { SelectCategory } from "@/db/schema";
 
@@ -19,9 +20,11 @@ type CategoryWithTransactions = SelectCategory & {
 
 interface BudgetClientProps{
     budgets: CategoryWithTransactions[];
+    totalIncome: number;
+    totalExpense: number;
 }
 
-export default function BudgetsClient({budgets}:BudgetClientProps){
+export default function BudgetsClient({budgets, totalIncome, totalExpense}:BudgetClientProps){
     const [isOpen, setIsOpen] = useState(false);
 
     const INPUTBOXES = [
@@ -35,6 +38,8 @@ export default function BudgetsClient({budgets}:BudgetClientProps){
             id: "monthly_budget",
             text: "Monthly Budget ($)",
             type: "number",
+            step: "0.01",
+            min: "0.01",
             required: true,
         }
     ];
@@ -52,8 +57,35 @@ export default function BudgetsClient({budgets}:BudgetClientProps){
         }else{
             toast.error(`Failed to add ${categoryName}.`, { id: toastId });
         };
-
     };
+
+    {/* 1. Filter out the income entries first */}
+    const filteredBudgets = budgets?.filter(
+        (budget) => 
+            budget.name?.toLowerCase() !== "income"
+    ) || [];
+
+    {/* 1. Locate the single budget item where the name or type matches "income" */}
+    const incomeCategory = budgets?.find(
+        (b) => b.name?.toLowerCase() === "income"
+    );
+
+    {/* 2. Create a fallback safe object structure in case no database entry exists yet */}
+    const defaultIncomeCategory = {
+        id: 0,
+        userId: "",
+        name: "Income",
+        monthly_budget: 0,
+        icon: "Coins", // Matches a default value in your categoryIconMap
+        spentAmount: 0,
+        totalIncomeAmount: totalIncome,
+        totalExpenseAmount: totalExpense
+    };
+
+    {/* 3. Combine the database object values with the incoming totals */}
+    const categoryPayload = incomeCategory 
+        ? { ...incomeCategory, totalIncomeAmount: totalIncome, totalExpenseAmount: totalExpense }
+        : defaultIncomeCategory;
     return(
         <>
             <div className="h-full overflow-y-auto no-scrollbar p-4">
@@ -70,15 +102,20 @@ export default function BudgetsClient({budgets}:BudgetClientProps){
                     </Button>
                 </div>
 
+                <div className="mb-6">
+                    <TotalBudget totalIncomeAmount={totalIncome} totalExpenseAmount={totalExpense} category={categoryPayload} />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 flex-1 gap-4 overflow-y-auto no-scrollbar content-start">
-                    {budgets && budgets.length > 0 ? (
-                        budgets.map((budget) => (
+                    {/* 2. Render based on the filtered list */}
+                    {filteredBudgets.length > 0 ? (
+                        filteredBudgets.map((budget) => (
                             <BudgetsCard key={budget.id} category={budget} />
                         ))
                     ) : (
-                        <div className=" h-30 flex items-center justify-center col-span-3 text-center text-muted-foreground">
+                        <div className="h-30 flex items-center justify-center col-span-3 text-center text-muted-foreground">
                             <p className="bg-card h-2/3 w-1/2 flex items-center justify-center rounded-xl shadow-sm transition-all">
-                                No budgets found.
+                                No expense budgets found.
                             </p>
                         </div>
                     )}
@@ -115,6 +152,8 @@ export default function BudgetsClient({budgets}:BudgetClientProps){
                                         id={input.id}
                                         type={input.type}
                                         name={input.id}
+                                        step={input.step}
+                                        min={input.min}
                                         required={input.required}
                                         className="h-10 transition-all duration-300"
                                     />
@@ -131,7 +170,6 @@ export default function BudgetsClient({budgets}:BudgetClientProps){
                                     className="h-10 w-full min-w-0 rounded-lg border border-input bg-border/30 px-2.5 py-1 text-base text-muted-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                                 >
                                     <option className="bg-background text-muted-foreground" value="" disabled>Select Category Icon</option>
-                                    <option className="bg-background text-foreground" value="Income">Income</option>
                                     <option className="bg-background text-foreground" value="Savings">Savings</option>
                                     <option className="bg-background text-foreground" value="Food">Food</option>
                                     <option className="bg-background text-foreground" value="Shopping">Shopping</option>

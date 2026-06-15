@@ -62,7 +62,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Toaster richColors position="top-center" />
+          <Toaster richColors position="top-center" duration={500} />
           <Analytics />
         </ThemeProvider>
       </body>

@@ -15,6 +15,13 @@
       "when": 1781471706175,
       "tag": "0001_sudden_the_professor",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781553143543,
+      "tag": "0002_needy_union_jack",
+      "breakpoints": true
     }
   ]
 }
