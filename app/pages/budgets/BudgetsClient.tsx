@@ -9,6 +9,7 @@ import { HiX } from "react-icons/hi";
 import { toast } from "sonner";
 import { createBudget } from "@/app/actions/budgets"
 import BudgetsCard from "@/components/app/budgets/BudgetsCard"
+import TotalBudget from "@/components/app/budgets/TotalBudget"
 //
 import type { SelectCategory } from "@/db/schema";
 
@@ -54,6 +55,12 @@ export default function BudgetsClient({budgets}:BudgetClientProps){
         };
 
     };
+
+    const incomeBudget = budgets?.find((budget) => budget.icon === "Income");
+
+    const totalIncomeAmount = incomeBudget?.spentAmount || 0;
+
+
     return(
         <>
             <div className="h-full overflow-y-auto no-scrollbar p-4">
@@ -71,6 +78,7 @@ export default function BudgetsClient({budgets}:BudgetClientProps){
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 flex-1 gap-4 overflow-y-auto no-scrollbar content-start">
+                    <TotalBudget totalIncomeAmount={totalIncomeAmount}/>
                     {budgets && budgets.length > 0 ? (
                         budgets.map((budget) => (
                             <BudgetsCard key={budget.id} category={budget} />
@@ -134,7 +142,8 @@ export default function BudgetsClient({budgets}:BudgetClientProps){
                                     <option className="bg-background text-foreground" value="Income">Income</option>
                                     <option className="bg-background text-foreground" value="Savings">Savings</option>
                                     <option className="bg-background text-foreground" value="Food">Food</option>
-                                    <option className="bg-background text-foreground" value="Shopping">Shopping</option>
+                                    <option className="bg-background text-foreground" value="Housing">Housing</option>
+                                    <option className="bg-background text-foreground" value="Transportation">Transportation</option>                                    <option className="bg-background text-foreground" value="Shopping">Shopping</option>
                                     <option className="bg-background text-foreground" value="Health">Health</option>
                                     <option className="bg-background text-foreground" value="Entertainment">Entertainment</option>
                                     <option className="bg-background text-foreground" value="Education">Education</option>
