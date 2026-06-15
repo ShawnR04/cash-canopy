@@ -27,7 +27,7 @@ export default function ForgotPassword(){
                 toast.error(res?.error || `Failed to send reset link`, {id: toastId});
             }
         }catch(error){
-            toast.error("121An unexpected error occured.", {id: toastId});
+            toast.error("An unexpected error occured.", {id: toastId});
         }
 
     }

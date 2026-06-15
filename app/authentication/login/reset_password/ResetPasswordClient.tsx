@@ -44,7 +44,7 @@ export default function ResetPasswordClient({ token }:{token?: string}){
             if(res?.success){
                 toast.success(`Password reset successfully`,{id:toastId});
                 formElement.reset();
-                router.push("/Authentication/login");
+                router.push("/authentication/login");
             }else{
                 toast.error(res?.error || `Failed to reset password`,{id:toastId});
             }

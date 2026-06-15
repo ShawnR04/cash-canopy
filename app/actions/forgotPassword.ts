@@ -58,17 +58,75 @@ export async function requestPasswordReset(formData: FormData) {
 
         // Send the email via Resend
         const { data, error: emailError } = await resend.emails.send({
-            from: 'CashCanopy Security <security@cashcanopy.dev>', // Replace with your domain once verified in Resend
+            from: 'CashCanopy Security <security@cashcanopy.dev>', 
             to: [user.email],
             subject: 'Password Reset Request',
             html: `
-                <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
-                    <h2>Password Reset Request</h2>
-                    <p>You requested a password reset for your Expense Tracker account.</p>
-                    <p>Click the link below to set a new password. This link is valid for <strong>1 hour</strong>.</p>
-                    <p style="margin: 24px 0;"><a href="${resetLink}" style="background: var(--primary); color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Reset Password</a></p>
-                    <p style="color: #666; font-size: 12px;">If you didn't request this, you can safely ignore this email.</p>
-                </div>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Reset Your Password</title>
+                </head>
+                <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 48px 16px;">
+                        <tr>
+                            <td align="center">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 480px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                                    
+                                    <tr>
+                                        <td style="background-color: #0f172a; padding: 32px; text-align: center;">
+                                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.025em;">
+                                                CashCanopy
+                                            </h1>
+                                        </td>
+                                    </tr>
+        
+                                    <tr>
+                                        <td style="padding: 40px 32px;">
+                                            <h2 style="margin: 0 0 16px 0; color: #0f172a; font-size: 20px; font-weight: 600; line-height: 1.3;">
+                                                Password Reset Request
+                                            </h2>
+                                            <p style="margin: 0 0 16px 0; color: #334155; font-size: 15px; line-height: 1.6;">
+                                                We received a request to reset the password for your Expense Tracker account. No changes have been made yet.
+                                            </p>
+                                            <p style="margin: 0 0 32px 0; color: #475569; font-size: 14px; line-height: 1.6;">
+                                                Click the button below to set up a new password. This link is valid for <strong style="color: #0f172a;">1 hour</strong>.
+                                            </p>
+        
+                                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                                <tr>
+                                                    <td align="center" style="padding-bottom: 16px;">
+                                                        <a href="${resetLink}" target="_blank" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 32px; border-radius: 6px; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);">
+                                                            Reset Password
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+        
+                                    <tr>
+                                        <td style="padding: 0 32px;">
+                                            <div style="border-top: 1px solid #f1f5f9;"></div>
+                                        </td>
+                                    </tr>
+        
+                                    <tr>
+                                        <td style="padding: 32px; background-color: #fafafa;">
+                                            <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5; text-align: center;">
+                                                If you didn't make this request, you can safely ignore this email. Your password will remain secure.
+                                            </p>
+                                        </td>
+                                    </tr>
+        
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
             `
         });
 
@@ -83,6 +141,6 @@ export async function requestPasswordReset(formData: FormData) {
 
     } catch (error) {
         console.error("Forgot Password Error:", error);
-        return { success: false, error: "12An unexpected error occurred." };
+        return { success: false, error: "An unexpected error occurred." };
     }
 }
