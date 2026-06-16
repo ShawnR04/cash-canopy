@@ -1,17 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌳 Cash Canopy
 
-## Getting Started
+Cash Canopy is a modern, full-stack personal finance dashboard built with Next.js. It helps users seamlessly track their income, monitor expenses, manage budgets, and stay on top of their financial goals—all within a beautifully designed, responsive interface.
 
-First, run the development server:
+## ✨ Features
+
+- **📊 Financial Dashboard**: Visualize your financial health with interactive charts and graphs (powered by Recharts).
+- **💰 Income & Expense Tracking**: Easily log, categorize, and review your daily transactions.
+- **🎯 Goal Tracking**: Set financial goals and visually track your progress towards them.
+- **📑 PDF Reports**: Generate and download detailed, stylized PDF ledgers and statements (powered by jsPDF).
+- **📱 PWA Ready**: Install Cash Canopy on your desktop or mobile device for a native app-like experience.
+- **🎨 Theming**: Fully supports light and dark modes with a sleek UI (built with Tailwind CSS & Shadcn UI).
+- **✉️ Email Notifications**: Integrated with Resend for transactional email delivery.
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js (App Router)
+- **Language**: TypeScript
+- **Database**: SQLite / Turso with Drizzle ORM
+- **Styling**: Tailwind CSS & Shadcn UI
+- **Data Visualization**: Recharts
+- **Authentication**: Custom Auth with `bcrypt-ts`
+- **State Management**: `nuqs` (URL query state)
+- **Analytics**: Vercel Web Analytics
+
+## 🚀 Getting Started
+
+### Prerequisites
+Make sure you have Node.js (v18+) installed.
+
+### 1. Clone & Install
+Clone the repository and install the dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
