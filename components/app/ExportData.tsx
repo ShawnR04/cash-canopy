@@ -178,7 +178,7 @@ export default function ExportData({ username }: ExportDataProps) {
           
           return [
             g.name,
-            new Date(g.targetDate).toLocaleDateString(),
+            g.targetDate ? new Date(g.targetDate).toLocaleDateString() : "N/A",
             `$${g.savedAmount.toFixed(2)}`,
             `$${g.targetAmount.toFixed(2)}`,
             `${progress}%`,

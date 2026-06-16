@@ -17,7 +17,7 @@ export interface ExportGoal {
   name: string;
   targetAmount: number;
   savedAmount: number;
-  targetDate: string;
+  targetDate: string | null;
 }
 
 export async function getExportData() {
@@ -55,7 +55,7 @@ export async function getExportData() {
     name: g.name,
     targetAmount: Number(g.targetAmount) || 0,
     savedAmount: Number(g.savedAmount) || 0,
-    targetDate: new Date(g.targetDate).toISOString(),
+    targetDate: g.targetDate ? new Date(g.targetDate).toISOString() : null,
   }));
 
   const userBudgets = await getUserBudgets();
