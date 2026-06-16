@@ -18,6 +18,7 @@ export default function ExportData({ username }: ExportDataProps) {
     try {
       const {
         transactions,
+        goals,
         totalBalance,
         monthlyIncome,
         monthlyExpenses,
@@ -158,6 +159,52 @@ export default function ExportData({ username }: ExportDataProps) {
           }
         },
       });
+
+      // Extract the Y coordinate of where the transactions table ended
+      const finalY = (doc as any).lastAutoTable?.finalY || 200;
+
+      // Only draw the Goals section if there are goals to show
+      if (goals && goals.length > 0) {
+        const goalsTitleY = finalY + 40;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(TEXT_DARK.r, TEXT_DARK.g, TEXT_DARK.b);
+        doc.text("Financial Goals Progress", 40, goalsTitleY);
+
+        const goalsTableData = goals.map((g: any) => {
+          const progress = g.targetAmount > 0 
+            ? ((g.savedAmount / g.targetAmount) * 100).toFixed(1) 
+            : "0.0";
+          
+          return [
+            g.name,
+            new Date(g.targetDate).toLocaleDateString(),
+            `$${g.savedAmount.toFixed(2)}`,
+            `$${g.targetAmount.toFixed(2)}`,
+            `${progress}%`,
+          ];
+        });
+
+        autoTable(doc, {
+          startY: goalsTitleY + 15,
+          margin: { left: 40, right: 40 },
+          head: [["Goal Name", "Target Date", "Saved", "Target", "Progress"]],
+          body: goalsTableData,
+          theme: "striped",
+          headStyles: {
+            fillColor: [0, 133, 255],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            fontSize: 9,
+          },
+          bodyStyles: { fontSize: 9, textColor: [51, 65, 85] },
+          columnStyles: {
+            2: { halign: "right" },
+            3: { halign: "right" },
+            4: { halign: "right", fontStyle: "bold" },
+          },
+        });
+      }
 
       const totalPages = (doc as any).internal.getNumberOfPages();
       for (let i = 1; i <= totalPages; i++) {
