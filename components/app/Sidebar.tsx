@@ -129,6 +129,9 @@ export default function Sidebar({activeTab, setActiveTab, username, accounts, us
                             <Settings className="w-8 h-8"/>
                         </button>
                     </div>
+                    <div className="h-10 flex items-center justify-center">
+                        <h1 className="">Version 3.0.0</h1>
+                    </div>
                 </nav>
             </aside>
         </>
