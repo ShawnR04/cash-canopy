@@ -1,11 +1,12 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Button} from "@/components/ui/button"
+import AppProcessScroll from "@/components/app/home/AppProcessScroll"
 
 export default function Hero() {
   return (
     <div className="h-dvh overflow-y-auto no-scrollbar">
-      <div className="h-15 w-full px-2 flex items-center justify-between fixed">
+      <div className="h-15 w-full px-2 flex items-center justify-between fixed bg-background">
         <div className="flex items-center gap-2">
           <Image
             src="/favicon.ico"
@@ -35,7 +36,7 @@ export default function Hero() {
           </Link>
         </div>
       </div>
-      <div className="h-full px-1 overflow-y-auto no-scrollbar">
+      <div className="h-full px-1 pt-15 overflow-y-auto no-scrollbar">
         <div className="h-full flex flex-col items-center justify-center gap-2">
           <h1 className="md:w-2/3 lg:w-2/3 font-bold text-3xl md:text-4xl lg:text-5xl text-center">
             Everything you need to manage your personal expenses
@@ -53,8 +54,10 @@ export default function Hero() {
             </Link>
           </Button>
         </div>
+        <div className="h-full">
+          <AppProcessScroll/>
+        </div>
       </div>
-      <div className=""></div>
     </div>
   );
 }
